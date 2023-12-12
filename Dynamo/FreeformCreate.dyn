@@ -1,0 +1,259 @@
+{
+  "Uuid": "246e4258-e5f0-4a83-ada3-dd615e602231",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "FreeformCreate",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "import clr\r\n\r\nclr.AddReference('RevitAPI')\r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.DB.Structure import *\r\n\r\nclr.AddReference('RevitAPIUI')\r\nfrom Autodesk.Revit.UI import *\r\n\r\nclr.AddReference('System')\r\nfrom System.Collections.Generic import List, IList\r\n\r\nclr.AddReference('RevitNodes')\r\nimport Revit\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.ImportExtensions(Revit.Elements)\r\n\r\nclr.AddReference('RevitServices')\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager\r\nfrom RevitServices.Transactions import TransactionManager\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument\r\n\r\ncuboid = UnwrapElement(IN[0])\r\n\r\nelem_num = 766598\r\nelem_id = ElementId(elem_num)\r\nelem = doc.GetElement(elem_id)\r\n\r\ngeoOptions = Options()\r\nif elem is not None:\r\n\tgeom = elem.get_Geometry(geoOptions)\r\n\r\n\r\nlstPtA = [XYZ(0,0,0), XYZ(25,0,0), XYZ(25,25,0), XYZ(0,25,0)]\r\nlstPtA.append(lstPtA[0])\r\nlstCurveA = [Line.CreateBound(lstPtA[idx -1], pt) for idx, pt in enumerate(lstPtA) if idx > 0]\r\ncurvloopA = CurveLoop.Create(lstCurveA)\r\ncurveLoopList = List[CurveLoop]([curvloopA])\r\n\r\n\r\n\r\nmaterialIdSteel = ElementId(509467)\r\n\r\nsolidOpt = SolidOptions(materialIdSteel, ElementId.InvalidElementId)\r\n\r\n\r\nwith Transaction(doc, \"Test\") as tr:\r\n\ttr.Start()\r\n\tsolid = GeometryCreationUtilities.CreateExtrusionGeometry(curveLoopList, XYZ(0,0,1),30,solidOpt)\r\n\tgeomList = List[GeometryObject]()\r\n\tgeomList.Add(solid)\r\n\t\r\n\tds = DirectShape.CreateElement(doc, ElementId(BuiltInCategory.OST_GenericModel));\r\n\tds.ApplicationId = \"Application id\";\r\n\tds.ApplicationDataId = \"Geometry object id\";\r\n\t\r\n\tds.SetShape(geomList);\r\n\tOUT = ds.Id\r\n\ttr.Commit()\r\n\r\n\r\n\r\n#solid = None\r\n#for geo in geom:\r\n#\tif isinstance(geo, Solid):\r\n#\t\tsolid = geo\r\n\t\t\r\n#solid = geom as Solid()\r\n#geomList = List[GeometryObject]()\r\n#geomList.Add(solid)\r\n\r\n\r\n\r\n\r\n#with Transaction(doc, \"Test\") as tr:\r\n#\ttr.Start()\r\n#\t#if solid is not None:\r\n#\t#\tfreeform = FreeFormElement.Create(doc, solid)\r\n#\r\n#\tds = DirectShape.CreateElement(doc, ElementId(BuiltInCategory.OST_GenericModel));\r\n#\t\r\n#\tds.ApplicationId = \"Application id\";\r\n#\tds.ApplicationDataId = \"Geometry object id\";\r\n#\tds.SetShape(geomList);\r\n#\r\n#\ttr.Commit()\r\n#\t\r\n#OUT = ds",
+      "Engine": "IronPython2",
+      "VariableInputPorts": true,
+      "Id": "18fe5e9f8dd0481a99455437c2172794",
+      "Inputs": [
+        {
+          "Id": "5b73ed2ddeb84d2f96189825ad53cb77",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "28fb564eced54834a3fc0be8d4cbee6d",
+          "Name": "IN[1]",
+          "Description": "Input #1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "33dcddf687134463a2a22f9305f457ad",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Watch, CoreNodeModels",
+      "NodeType": "ExtensionNode",
+      "Id": "0a0fa99532d149a984cb724e10df551c",
+      "Inputs": [
+        {
+          "Id": "d1d7ff886bad486a9270d340ec271df5",
+          "Name": "",
+          "Description": "Node to show output from",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "dc85abec38aa4395a063a87522dee807",
+          "Name": "",
+          "Description": "Node output",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Visualize the node's output"
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "import clr\r\n\r\nclr.AddReference('RevitAPI')\r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.DB.Structure import *\r\n\r\nclr.AddReference('RevitAPIUI')\r\nfrom Autodesk.Revit.UI import *\r\n\r\nclr.AddReference('System')\r\nfrom System.Collections.Generic import List\r\n\r\nclr.AddReference('RevitNodes')\r\nimport Revit\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.ImportExtensions(Revit.Elements)\r\n\r\nclr.AddReference('RevitServices')\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager\r\nfrom RevitServices.Transactions import TransactionManager\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument\r\n\r\nOUT = []\r\n\r\nselection = uidoc.Selection\r\nids = selection.GetElementIds()\r\n\r\nif ids.Count > 0:\r\n\tfor id in ids:\r\n\t\telem = doc.GetElement(id)\r\n\t\tmaterials = elem.GetMaterialIds(False)\r\n\t\tfor matId in materials:\r\n\t\t\tmatName = doc.GetElement(matId).Name\r\n\t\t\tOUT.append([matId, matName])\r\n",
+      "Engine": "IronPython2",
+      "VariableInputPorts": true,
+      "Id": "6f8d365bb5eb484592340064f0add9db",
+      "Inputs": [
+        {
+          "Id": "032f8a6609ff44d98cbdd5eca5cb3c6e",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "61e02bdb89f342678df232a8cc6529c5",
+          "Name": "IN[1]",
+          "Description": "Input #1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "08eec332c7ff4403986ec37fe0588e40",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Watch, CoreNodeModels",
+      "NodeType": "ExtensionNode",
+      "Id": "3a2c15da0cba4063bffc9b8b2210fc7b",
+      "Inputs": [
+        {
+          "Id": "cfc188a026b840019ec36acb20dfab04",
+          "Name": "",
+          "Description": "Node to show output from",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "67460b8c3a7341488a4d8291231f97bd",
+          "Name": "",
+          "Description": "Node output",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Visualize the node's output"
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "33dcddf687134463a2a22f9305f457ad",
+      "End": "d1d7ff886bad486a9270d340ec271df5",
+      "Id": "ae95d38d99694a989621099dc3367709"
+    },
+    {
+      "Start": "08eec332c7ff4403986ec37fe0588e40",
+      "End": "cfc188a026b840019ec36acb20dfab04",
+      "Id": "5a422830e25241c9ba8750832aa50cb7"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "2.12",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "1.10",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.12.1.8246",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "NodeViews": [
+      {
+        "ShowGeometry": true,
+        "Name": "Python Script",
+        "Id": "18fe5e9f8dd0481a99455437c2172794",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": true,
+        "X": 539.0,
+        "Y": 230.0
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Watch",
+        "Id": "0a0fa99532d149a984cb724e10df551c",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 803.0,
+        "Y": 117.0
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Python Script",
+        "Id": "6f8d365bb5eb484592340064f0add9db",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 405.09128101093086,
+        "Y": 434.09081493394149
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Watch",
+        "Id": "3a2c15da0cba4063bffc9b8b2210fc7b",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 648.86416599657878,
+        "Y": 418.86359634692508
+      }
+    ],
+    "Annotations": [],
+    "X": -343.5477440356533,
+    "Y": -93.116226519294514,
+    "Zoom": 0.92198022321671369
+  }
+}
